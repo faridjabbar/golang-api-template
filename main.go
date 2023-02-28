@@ -1,25 +1,23 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"voltunes-chick-api-master-product/app"
+	c "voltunes-chick-api-master-product/configuration"
 	"voltunes-chick-api-master-product/helper"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load()
+	configuration, err := c.LoadConfig()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln("Failed at config", err)
 	}
 
-	port := os.Getenv("PORT")
-	db := app.ConnectDatabase()
+	port := configuration.Port
+	db := app.ConnectDatabase(configuration.User, configuration.Host, configuration.Password, configuration.PortDB, configuration.Db)
 
 	// Validator
 	validate := validator.New()
@@ -30,7 +28,7 @@ func main() {
 		Addr:    ":" + port,
 		Handler: router,
 	}
-	log.Println(fmt.Sprintf("Server is running on port %s", port))
+	log.Printf("Server is running on port %s", port)
 
 	err = server.ListenAndServe()
 	helper.PanicIfError(err)
