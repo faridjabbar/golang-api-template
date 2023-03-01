@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"time"
+	"voltunes-chick-api-master-product/model/domain"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -29,7 +30,9 @@ func ConnectDatabase(user, host, password, port, db string) *gorm.DB {
 		panic("failed to connect database")
 	}
 
-	err = database.AutoMigrate()
+	err = database.AutoMigrate(
+		&domain.Bank{},
+	)
 	if err != nil {
 		panic("failed to auto migrate schema")
 	}
